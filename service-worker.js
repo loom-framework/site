@@ -7,7 +7,7 @@
 // -----------------------------------------------------------------------------
 
 // --- Versioning -------------------------------------------------------------
-const SW_VERSION = "2"; 
+const SW_VERSION = "4"; 
 const CACHE_NAME = `kineport-app-cache-${SW_VERSION}`;
 
 const PRECACHE_URLS = [
