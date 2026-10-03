@@ -6,54 +6,9 @@ E-mail: loom.framework@gmail.com
 Created: 2008
 */
 
-/* API Dashboard Container */
-#api-result {
-    width: 100%;
-    max-width: 420px;
-    min-height: 180px;
-    /*max-height: 180px;*/
-
-    padding: 12px 14px;
-
-    font-size: 8px;
-    line-height: 0.7;
-    box-sizing: border-box;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
-}
-
-/* Section header */
-#api-result .section-title {
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-
-/* Compact list */
-#api-result ul {
-    margin: 0;
-    padding-left: 14px;
-    padding-top: 0px;
-}
-
-#api-result li {
-    margin: 2px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Status icon */
-#api-result li .status-icon {
-    width: 16px;
-    text-align: center;
-    font-size: 12px;
-}
-
-/* Path aligned right */
-#api-result code {
-    margin-left: auto;
-    opacity: 0.6;
-    font-size: 11px;
+.tts-active {
+background:#fff3a0;
+color:inherit;
+border-radius:4px;
+transition:background .2s ease;
 }
