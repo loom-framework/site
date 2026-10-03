@@ -7,8 +7,9 @@ Created: 2008
 */
 
 .tts-active {
-background:#fff3a0;
-color:inherit;
-border-radius:4px;
-transition:background .2s ease;
+border-left:4px solid #2563eb;
+padding-left:1rem;
+background:rgba(37,99,235,.08);
+border-radius:.25rem;
+transition:.2s;
 }
