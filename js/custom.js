@@ -6,107 +6,118 @@
 // Created: 2008
 // -----------------------------------------------------------------------------
 
-// ===============================
-//  Kineport Semantic TTS
-//  Checkbox/Label version
-// ===============================
+(() => {
 
-const KineportSemanticTTS = (() => {
-
-    let utterance = null;
-    let isSpeaking = false;
-
-    const TAG_MAP = {
-        "H1": "\n\n",
-        "H2": "\n\n",
-        "H3": "\n",
-        "H4": "\n",
-        "H5": "\n",
-        "H6": "\n",
-        "P": "\n",
-        "LI": "• ",
-        "FIGCAPTION": "\n",
-        "BLOCKQUOTE": "\nCitāts: ",
-        "SECTION": "\n",
-        "ARTICLE": "\n",
-        "NAV": "\n",
-        "ASIDE": "\n"
-    };
-
-    function extractSemanticText(root) {
-        let output = "";
-
-        const walker = document.createTreeWalker(
-            root,
-            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-
-        while (walker.nextNode()) {
-            const node = walker.currentNode;
-
-            if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.textContent.trim();
-                if (text.length > 0) output += text + " ";
-            }
-
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const tag = node.tagName;
-                if (TAG_MAP[tag]) output += TAG_MAP[tag];
-            }
-        }
-
-        return output.trim();
+    if (
+        !('speechSynthesis' in window) ||
+        !('SpeechSynthesisUtterance' in window)
+    ) {
+        console.warn('TTS nav pieejams');
+        return;
     }
 
-    function speak(text, lang = "lv") {
-        stop();
+    let speaking = false;
 
-        utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang;
-        utterance.rate = 1;
-        utterance.pitch = 1;
+    const SELECTOR =
+        'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption';
 
-        utterance.onend = () => { isSpeaking = false; };
-        utterance.onerror = () => { isSpeaking = false; };
-
-        isSpeaking = true;
-        speechSynthesis.speak(utterance);
+    function clearHighlight() {
+        document
+            .querySelectorAll('.tts-active')
+            .forEach(el => el.classList.remove('tts-active'));
     }
 
-    function stop() {
-        if (isSpeaking) {
-            speechSynthesis.cancel();
-            isSpeaking = false;
-        }
+    function getBlocks() {
+
+        const root =
+            document.querySelector('[data-tts-root]');
+
+        if (!root) return [];
+
+        return [...root.querySelectorAll(SELECTOR)]
+            .filter(el => el.textContent.trim());
     }
 
-    function init() {
+    function speakBlock(text, lang) {
 
-        // Klausāmies checkbox pārslēgšanos
-        document.addEventListener("change", (e) => {
-            if (e.target.id === "ttsToggle") {
+        return new Promise(resolve => {
 
-                const root = document.querySelector('[data-tts-root][id="main"]');
-                if (!root) return;
+            const utterance =
+                new SpeechSynthesisUtterance(text);
 
-                const lang = root.getAttribute("lang") || "lv";
-                const text = extractSemanticText(root);
+            utterance.lang = lang;
 
-                if (e.target.checked) {
-                    speak(text, lang);
-                } else {
-                    stop();
-                }
-            }
+            utterance.rate = 1;
+            utterance.pitch = 1;
+
+            utterance.onend = resolve;
+            utterance.onerror = resolve;
+
+            speechSynthesis.speak(utterance);
+
         });
+
     }
 
-    return { init, speak, stop };
+    async function speakPage() {
+
+        const root =
+            document.querySelector('[data-tts-root]');
+
+        if (!root) return;
+
+        const blocks = getBlocks();
+
+        if (!blocks.length) return;
+
+        speaking = true;
+
+        const lang =
+            root.getAttribute('lang') || 'lv';
+
+        for (const block of blocks) {
+
+            if (!speaking) break;
+
+            clearHighlight();
+
+            block.classList.add('tts-active');
+
+            await speakBlock(
+                block.innerText.trim(),
+                lang
+            );
+
+        }
+
+        clearHighlight();
+
+        speaking = false;
+    }
+
+    function stopPage() {
+
+        speaking = false;
+
+        speechSynthesis.cancel();
+
+        clearHighlight();
+    }
+
+    document.addEventListener('click', e => {
+
+        const btn = e.target.closest('#tts-btn');
+
+        if (!btn) return;
+
+        if (speaking) {
+            stopPage();
+        } else {
+            speakPage();
+        }
+
+    });
 
 })();
-
-KineportSemanticTTS.init();
 
 
