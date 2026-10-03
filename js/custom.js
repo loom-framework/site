@@ -79,23 +79,19 @@ const KineportSemanticTTS = (() => {
     }
 
     function init() {
-        const triggers = document.querySelectorAll("[data-tts-trigger]");
 
-        triggers.forEach(btn => {
-            const targetId = btn.getAttribute("data-tts-trigger");
-            const root = document.querySelector(`[data-tts-root${targetId ? `#${targetId}` : ""}]`)
-                || document.querySelector(`[data-tts-root][id='${targetId}']`)
-                || document.querySelector(`[data-tts-root]`);
+        // Klausāmies header komponenta notikumu
+        document.addEventListener("tts-trigger", (e) => {
+            const id = e.detail.target;
+            const root = document.querySelector(`[data-tts-root][id="${id}"]`);
 
-            btn.addEventListener("click", () => {
-                if (!root) return;
+            if (!root) return;
 
-                const lang = root.getAttribute("lang") || "lv";
-                const text = extractSemanticText(root);
+            const lang = root.getAttribute("lang") || "lv";
+            const text = extractSemanticText(root);
 
-                if (!isSpeaking) speak(text, lang);
-                else stop();
-            });
+            if (!isSpeaking) speak(text, lang);
+            else stop();
         });
     }
 
