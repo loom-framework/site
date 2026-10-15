@@ -10,90 +10,95 @@ Created: 2008
    TTS BUTTON
    ========================================== */
 
-.tts-toggle {
+.tts-toggle{
     display:inline-block;
 }
 
-.tts-toggle input {
-    display:none;
+.tts-toggle input{
+    position:absolute;
+    opacity:0;
+    width:0;
+    height:0;
+    pointer-events:none;
 }
 
-.tts-btn {
-
+.tts-btn{
     display:inline-flex;
     align-items:center;
-    gap:.65rem;
+    gap:.75rem;
 
     padding:.65rem 1rem;
 
-    border:1px solid var(--border-color,#d9d9d9);
+    background:#fff;
+
+    border:1px solid #d9d9d9;
     border-radius:999px;
 
-    background:var(--surface,#fff);
-
-    color:inherit;
-
     cursor:pointer;
+
     user-select:none;
 
     transition:all .2s ease;
 }
 
-.tts-btn:hover {
-    background:rgba(0,0,0,.04);
+.tts-btn:hover{
+    background:#f8f8f8;
 }
 
-.tts-btn svg {
+.tts-btn svg{
     width:18px;
     height:18px;
-
     fill:currentColor;
-
     display:block;
 }
 
-.tts-play {
+/* ---------- Default state ---------- */
+
+.tts-play{
     display:flex;
-    align-items:center;
-    justify-content:center;
 }
 
-.tts-pause {
+.tts-pause{
     display:none;
-    align-items:center;
-    justify-content:center;
 }
 
-.tts-label {
-    font-size:.9rem;
-    font-weight:500;
-    line-height:1;
+.label-play{
+    display:inline;
 }
 
-/* ACTIVE STATE */
+.label-pause{
+    display:none;
+}
 
-#ttsToggle:checked + .tts-btn {
+/* ---------- Active state ---------- */
 
+.tts-toggle input:checked + .tts-btn{
     border-color:#2563eb;
     color:#2563eb;
-
     background:rgba(37,99,235,.08);
 }
 
-#ttsToggle:checked + .tts-btn .tts-play {
+.tts-toggle input:checked + .tts-btn .tts-play{
     display:none;
 }
 
-#ttsToggle:checked + .tts-btn .tts-pause {
+.tts-toggle input:checked + .tts-btn .tts-pause{
     display:flex;
 }
 
+.tts-toggle input:checked + .tts-btn .label-play{
+    display:none;
+}
+
+.tts-toggle input:checked + .tts-btn .label-pause{
+    display:inline;
+}
 
 /* ==========================================
    ACTIVE READING HIGHLIGHT
    ========================================== */
 
-.tts-active {
+.tts-active{
 
     border-left:4px solid #2563eb;
 
@@ -103,6 +108,6 @@ Created: 2008
 
     border-radius:.25rem;
 
-    transition:all .25s ease;
+    transition:.25s ease;
 }
 
