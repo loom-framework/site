@@ -23,27 +23,22 @@
   </nav>
   
   <div class="header-right">
-<label class="tts-toggle" aria-label="Read page aloud">
+<label class="tts-toggle">
 
     <input type="checkbox" id="ttsToggle">
 
     <span class="tts-btn">
 
-        <span class="tts-play">
+        <span class="tts-icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 5v14l11-7z"></path>
+                <path id="ttsIconPath"
+                      d="M8 5v14l11-7z">
+                </path>
             </svg>
         </span>
 
-        <span class="tts-pause">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 5h4v14H6zm8 0h4v14h-4z"></path>
-            </svg>
-        </span>
-
-        <span class="tts-text">
-            <span class="label-play">Read Aloud</span>
-            <span class="label-pause">Stop Reading</span>
+        <span id="ttsLabel">
+            Read Aloud
         </span>
 
     </span>

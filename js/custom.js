@@ -12,6 +12,7 @@
         !('speechSynthesis' in window) ||
         !('SpeechSynthesisUtterance' in window)
     ) {
+        console.warn('TTS not supported');
         return;
     }
 
@@ -19,6 +20,58 @@
 
     const BLOCK_SELECTOR =
         'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption';
+
+    function getButton() {
+        return document.querySelector('.tts-btn');
+    }
+
+    function getLabel() {
+        return document.getElementById('ttsLabel');
+    }
+
+    function getIcon() {
+        return document.getElementById('ttsIconPath');
+    }
+
+    function setPlayMode() {
+
+        const btn = getButton();
+        const label = getLabel();
+        const icon = getIcon();
+
+        btn?.classList.remove('active');
+
+        if (label) {
+            label.textContent = 'Read Aloud';
+        }
+
+        if (icon) {
+            icon.setAttribute(
+                'd',
+                'M8 5v14l11-7z'
+            );
+        }
+    }
+
+    function setPauseMode() {
+
+        const btn = getButton();
+        const label = getLabel();
+        const icon = getIcon();
+
+        btn?.classList.add('active');
+
+        if (label) {
+            label.textContent = 'Stop Reading';
+        }
+
+        if (icon) {
+            icon.setAttribute(
+                'd',
+                'M6 5h4v14H6zm8 0h4v14h-4z'
+            );
+        }
+    }
 
     function clearHighlight() {
 
@@ -33,8 +86,11 @@
     function getBlocks(root) {
 
         return [
-            ...root.querySelectorAll(BLOCK_SELECTOR)
-        ].filter(el =>
+            ...root.querySelectorAll(
+                BLOCK_SELECTOR
+            )
+        ]
+        .filter(el =>
             el.textContent.trim() &&
             !el.closest('[data-tts-ignore]')
         );
@@ -49,13 +105,16 @@
                 new SpeechSynthesisUtterance(text);
 
             utterance.lang = lang;
+
             utterance.rate = 1;
             utterance.pitch = 1;
 
             utterance.onend = resolve;
             utterance.onerror = resolve;
 
-            speechSynthesis.speak(utterance);
+            speechSynthesis.speak(
+                utterance
+            );
 
         });
 
@@ -70,6 +129,8 @@
 
         stopRequested = false;
 
+        setPauseMode();
+
         const lang =
             root.getAttribute('lang') || 'lv';
 
@@ -78,34 +139,33 @@
 
         for (const block of blocks) {
 
-            if (stopRequested) {
+            if (stopRequested)
                 break;
-            }
 
             clearHighlight();
 
             block.classList.add('tts-active');
 
             block.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
+                behavior:'smooth',
+                block:'center'
             });
 
             await speakBlock(
                 block.textContent.trim(),
                 lang
             );
-
         }
+
+        speechSynthesis.cancel();
 
         clearHighlight();
 
-        speechSynthesis.cancel();
+        setPlayMode();
 
         if (checkbox) {
             checkbox.checked = false;
         }
-
     }
 
     function stopReading() {
@@ -116,74 +176,67 @@
 
         clearHighlight();
 
+        setPlayMode();
     }
 
-    function findShadowCheckboxes(root = document) {
+    function findTtsCheckbox() {
 
-        const results = [];
+        let checkbox =
+            document.getElementById('ttsToggle');
 
-        function scan(node) {
+        if (checkbox)
+            return checkbox;
 
-            if (!node) return;
+        const hosts =
+            document.querySelectorAll('*');
 
-            if (
-                node.querySelectorAll
-            ) {
+        for (const host of hosts) {
 
-                results.push(
-                    ...node.querySelectorAll('#ttsToggle')
+            if (!host.shadowRoot)
+                continue;
+
+            checkbox =
+                host.shadowRoot.querySelector(
+                    '#ttsToggle'
                 );
-            }
 
-            node.querySelectorAll?.('*')
-                .forEach(el => {
-
-                    if (el.shadowRoot) {
-                        scan(el.shadowRoot);
-                    }
-
-                });
-
+            if (checkbox)
+                return checkbox;
         }
 
-        scan(root);
-
-        return results;
-    }
-
-    function wireCheckbox(checkbox) {
-
-        if (checkbox.dataset.ttsBound) {
-            return;
-        }
-
-        checkbox.dataset.ttsBound = 'true';
-
-        checkbox.addEventListener('change', () => {
-
-            if (checkbox.checked) {
-
-                startReading(checkbox);
-
-            } else {
-
-                stopReading();
-
-            }
-
-        });
-
+        return null;
     }
 
     function init() {
 
-        const checkboxes =
-            findShadowCheckboxes();
+        const checkbox =
+            findTtsCheckbox();
 
-        checkboxes.forEach(
-            wireCheckbox
+        if (!checkbox) {
+            console.warn(
+                'ttsToggle not found'
+            );
+            return;
+        }
+
+        checkbox.addEventListener(
+            'change',
+            () => {
+
+                if (
+                    checkbox.checked
+                ) {
+
+                    startReading(
+                        checkbox
+                    );
+
+                } else {
+
+                    stopReading();
+                }
+            }
         );
-
     }
 
     window.addEventListener(
