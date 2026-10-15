@@ -121,11 +121,3 @@ clearHighlight();
 })();
 
 
-const checkbox =
-    document.getElementById('ttsToggle');
-
-if (checkbox) {
-    checkbox.checked = false;
-}
-
-
