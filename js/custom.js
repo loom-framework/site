@@ -8,6 +8,13 @@
 
 (() => {
 
+    if (
+        !('speechSynthesis' in window) ||
+        !('SpeechSynthesisUtterance' in window)
+    ) {
+        return;
+    }
+
     let stopRequested = false;
 
     const BLOCK_SELECTOR =
@@ -48,18 +55,13 @@
             utterance.onend = resolve;
             utterance.onerror = resolve;
 
-            speechSynthesis.speak(
-                utterance
-            );
+            speechSynthesis.speak(utterance);
 
         });
 
     }
 
-    async function startReading() {
-
-        const checkbox =
-            document.getElementById('ttsToggle');
+    async function startReading(checkbox) {
 
         const root =
             document.querySelector('[data-tts-root]');
@@ -90,15 +92,15 @@
             });
 
             await speakBlock(
-                block.innerText.trim(),
+                block.textContent.trim(),
                 lang
             );
 
         }
 
-        speechSynthesis.cancel();
-
         clearHighlight();
+
+        speechSynthesis.cancel();
 
         if (checkbox) {
             checkbox.checked = false;
@@ -116,17 +118,52 @@
 
     }
 
-    document.addEventListener(
-        'change',
-        e => {
+    function findShadowCheckboxes(root = document) {
 
-            if (e.target.id !== 'ttsToggle') {
-                return;
+        const results = [];
+
+        function scan(node) {
+
+            if (!node) return;
+
+            if (
+                node.querySelectorAll
+            ) {
+
+                results.push(
+                    ...node.querySelectorAll('#ttsToggle')
+                );
             }
 
-            if (e.target.checked) {
+            node.querySelectorAll?.('*')
+                .forEach(el => {
 
-                startReading();
+                    if (el.shadowRoot) {
+                        scan(el.shadowRoot);
+                    }
+
+                });
+
+        }
+
+        scan(root);
+
+        return results;
+    }
+
+    function wireCheckbox(checkbox) {
+
+        if (checkbox.dataset.ttsBound) {
+            return;
+        }
+
+        checkbox.dataset.ttsBound = 'true';
+
+        checkbox.addEventListener('change', () => {
+
+            if (checkbox.checked) {
+
+                startReading(checkbox);
 
             } else {
 
@@ -134,9 +171,24 @@
 
             }
 
-        }
+        });
+
+    }
+
+    function init() {
+
+        const checkboxes =
+            findShadowCheckboxes();
+
+        checkboxes.forEach(
+            wireCheckbox
+        );
+
+    }
+
+    window.addEventListener(
+        'DOMContentLoaded',
+        init
     );
 
 })();
-
-
