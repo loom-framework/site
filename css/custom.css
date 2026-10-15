@@ -10,11 +10,19 @@ Created: 2008
    TTS BUTTON
    ========================================== */
 
-.tts-toggle input{
+/* ==========================================
+   TTS BUTTON
+   ========================================== */
+
+.tts-toggle {
+    display:inline-block;
+}
+
+.tts-toggle input {
     display:none;
 }
 
-.tts-btn{
+.tts-btn {
 
     display:inline-flex;
     align-items:center;
@@ -30,47 +38,58 @@ Created: 2008
     color:inherit;
 
     cursor:pointer;
-
     user-select:none;
 
     transition:all .2s ease;
 }
 
-.tts-btn:hover{
+.tts-btn:hover {
     background:rgba(0,0,0,.04);
 }
 
-.tts-btn svg{
+.tts-btn svg {
     width:18px;
     height:18px;
 
-    display:block;
-
     fill:currentColor;
+
+    display:block;
 }
 
-.pause-icon{
+.tts-play {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.tts-pause {
     display:none;
+    align-items:center;
+    justify-content:center;
 }
 
-.tts-label{
+.tts-label {
     font-size:.9rem;
     font-weight:500;
     line-height:1;
 }
 
-#ttsToggle:checked + .tts-btn{
+/* ACTIVE STATE */
+
+#ttsToggle:checked + .tts-btn {
+
     border-color:#2563eb;
     color:#2563eb;
+
     background:rgba(37,99,235,.08);
 }
 
-#ttsToggle:checked + .tts-btn .play-icon{
+#ttsToggle:checked + .tts-btn .tts-play {
     display:none;
 }
 
-#ttsToggle:checked + .tts-btn .pause-icon{
-    display:block;
+#ttsToggle:checked + .tts-btn .tts-pause {
+    display:flex;
 }
 
 
@@ -78,7 +97,7 @@ Created: 2008
    ACTIVE READING HIGHLIGHT
    ========================================== */
 
-.tts-active{
+.tts-active {
 
     border-left:4px solid #2563eb;
 
@@ -90,3 +109,4 @@ Created: 2008
 
     transition:all .25s ease;
 }
+
