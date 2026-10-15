@@ -6,39 +6,36 @@ E-mail: loom.framework@gmail.com
 Created: 2008
 */
 
-/* ==========================================
+/* ==========================
    TTS BUTTON
-   ========================================== */
+   ========================== */
 
 .tts-toggle{
     display:inline-block;
 }
 
 .tts-toggle input{
-    position:absolute;
-    opacity:0;
-    width:0;
-    height:0;
-    pointer-events:none;
+    display:none;
 }
 
 .tts-btn{
+
     display:inline-flex;
     align-items:center;
     gap:.75rem;
 
     padding:.65rem 1rem;
 
-    background:#fff;
-
     border:1px solid #d9d9d9;
     border-radius:999px;
+
+    background:#fff;
 
     cursor:pointer;
 
     user-select:none;
 
-    transition:all .2s ease;
+    transition:.2s ease;
 }
 
 .tts-btn:hover{
@@ -49,54 +46,21 @@ Created: 2008
     width:18px;
     height:18px;
     fill:currentColor;
-    display:block;
 }
 
-/* ---------- Default state ---------- */
+.tts-btn.active{
 
-.tts-play{
-    display:flex;
-}
-
-.tts-pause{
-    display:none;
-}
-
-.label-play{
-    display:inline;
-}
-
-.label-pause{
-    display:none;
-}
-
-/* ---------- Active state ---------- */
-
-.tts-toggle input:checked + .tts-btn{
-    border-color:#2563eb;
     color:#2563eb;
+
+    border-color:#2563eb;
+
     background:rgba(37,99,235,.08);
 }
 
-.tts-toggle input:checked + .tts-btn .tts-play{
-    display:none;
-}
 
-.tts-toggle input:checked + .tts-btn .tts-pause{
-    display:flex;
-}
-
-.tts-toggle input:checked + .tts-btn .label-play{
-    display:none;
-}
-
-.tts-toggle input:checked + .tts-btn .label-pause{
-    display:inline;
-}
-
-/* ==========================================
-   ACTIVE READING HIGHLIGHT
-   ========================================== */
+/* ==========================
+   ACTIVE READING
+   ========================== */
 
 .tts-active{
 
