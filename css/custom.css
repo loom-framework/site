@@ -13,3 +13,66 @@ background:rgba(37,99,235,.08);
 border-radius:.25rem;
 transition:.2s;
 }
+
+
+
+
+.tts-toggle input{
+    display:none;
+}
+
+.tts-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:.7rem;
+
+    padding:.65rem 1rem;
+
+    border:1px solid var(--border-color,#d7d7d7);
+    border-radius:999px;
+
+    background:var(--surface,#fff);
+
+    color:inherit;
+
+    cursor:pointer;
+    user-select:none;
+
+    transition:all .2s ease;
+}
+
+.tts-btn:hover{
+    background:rgba(0,0,0,.03);
+}
+
+.tts-btn svg{
+    width:18px;
+    height:18px;
+
+    display:block;
+    fill:currentColor;
+}
+
+.pause-icon{
+    display:none;
+}
+
+.tts-label{
+    font-size:.9rem;
+    font-weight:500;
+    line-height:1;
+}
+
+#ttsToggle:checked + .tts-btn{
+    border-color:#2563eb;
+    background:rgba(37,99,235,.08);
+    color:#2563eb;
+}
+
+#ttsToggle:checked + .tts-btn .play-icon{
+    display:none;
+}
+
+#ttsToggle:checked + .tts-btn .pause-icon{
+    display:block;
+}
