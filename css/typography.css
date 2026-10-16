@@ -7,6 +7,25 @@ Created: 2008
 */
 
 @font-face {
+  font-family: 'Work Sans Variable';
+  /* Ensure this path matches your folder structure exactly */
+  src: url('/assets/fonts/Work_Sans/WorkSans-VariableFont_wdth,wght.ttf') format('truetype');
+  
+  /* WEIGHT: Supports Thin (100) to Black (900) */
+  font-weight: 100 900;
+  
+  /* WIDTH: Supports Condensed (75%) to Normal (100%) */
+  font-stretch: 75% 100%;
+  
+  /* STYLE: This file is upright only (No Italics inside) */
+  font-style: normal;
+  
+  /* DISPLAY: "Swap" ensures text is visible immediately */
+  font-display: swap;
+}
+
+
+@font-face {
   font-family: 'Roboto Variable';
   /* Ensure this path matches your folder structure exactly */
   src: url('/assets/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf') format('truetype');
