@@ -14,6 +14,8 @@
   }
 
   let stopRequested = false;
+  let reading = false;   // a reading session is active (playing or paused)
+  let paused = false;
 
   const BLOCK_SELECTOR = 'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption';
 
@@ -49,6 +51,8 @@
     }
 
     stopRequested = false;
+    reading = true;
+    paused = false;
 
     const lang = root.getAttribute('lang') || 'lv';
     const blocks = getBlocks(root);
@@ -63,16 +67,23 @@
       await speakBlock(block.textContent.trim(), lang);
     }
 
+    // finished (or cancelled): reset everything
     speechSynthesis.cancel();
     clearHighlight();
+    reading = false;
+    paused = false;
 
     checkbox.checked = false; // CSS switches the icon back
   }
 
-  function stopReading() {
-    stopRequested = true;
-    speechSynthesis.cancel();
-    clearHighlight();
+  function pauseReading() {
+    paused = true;
+    speechSynthesis.pause(); // keeps position and highlight
+  }
+
+  function resumeReading() {
+    paused = false;
+    speechSynthesis.resume();
   }
 
   function findTtsCheckbox() {
@@ -97,8 +108,17 @@
     }
 
     checkbox.addEventListener('change', () => {
-      checkbox.checked ? startReading(checkbox) : stopReading();
+      if (checkbox.checked) {
+        // checked = play: resume if paused, otherwise start from the beginning
+        paused ? resumeReading() : startReading(checkbox);
+      } else if (reading) {
+        // unchecked while reading = pause only
+        pauseReading();
+      }
     });
+
+    // don't leave a paused/ongoing utterance behind when leaving the page
+    window.addEventListener('beforeunload', () => speechSynthesis.cancel());
   }
 
   if (document.readyState === 'complete') {
