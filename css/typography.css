@@ -9,7 +9,7 @@ Created: 2008
 @font-face {
   font-family: 'Work Sans Variable';
   /* Ensure this path matches your folder structure exactly */
-  src: url('/assets/fonts/Work_Sans/WorkSans-VariableFont_wdth,wght.ttf') format('truetype');
+  src: url('/assets/fonts/Work_Sans/WorkSans-VariableFont_wght.ttf') format('truetype');
   
   /* WEIGHT: Supports Thin (100) to Black (900) */
   font-weight: 100 900;
