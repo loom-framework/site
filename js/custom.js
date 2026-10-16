@@ -6,107 +6,125 @@
 // Created: 2008
 // -----------------------------------------------------------------------------
 
-// ===============================
-//  Kineport Semantic TTS
-//  Checkbox/Label version
-// ===============================
+(() => {
 
-const KineportSemanticTTS = (() => {
+  if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+    console.warn('TTS not supported');
+    return;
+  }
 
-    let utterance = null;
-    let isSpeaking = false;
+  let stopRequested = false;
+  let reading = false;   // a reading session is active (playing or paused)
+  let paused = false;
 
-    const TAG_MAP = {
-        "H1": "\n\n",
-        "H2": "\n\n",
-        "H3": "\n",
-        "H4": "\n",
-        "H5": "\n",
-        "H6": "\n",
-        "P": "\n",
-        "LI": "• ",
-        "FIGCAPTION": "\n",
-        "BLOCKQUOTE": "\nCitāts: ",
-        "SECTION": "\n",
-        "ARTICLE": "\n",
-        "NAV": "\n",
-        "ASIDE": "\n"
-    };
+  const BLOCK_SELECTOR = 'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption';
 
-    function extractSemanticText(root) {
-        let output = "";
+  function clearHighlight() {
+    document.querySelectorAll('.tts-active')
+      .forEach(el => el.classList.remove('tts-active'));
+  }
 
-        const walker = document.createTreeWalker(
-            root,
-            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
+  function getBlocks(root) {
+    return [...root.querySelectorAll(BLOCK_SELECTOR)]
+      .filter(el => el.textContent.trim() && !el.closest('[data-tts-ignore]'));
+  }
 
-        while (walker.nextNode()) {
-            const node = walker.currentNode;
+  function speakBlock(text, lang) {
+    return new Promise(resolve => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.onend = resolve;
+      utterance.onerror = resolve;
+      window.__ttsUtterance = utterance; // keeps a reference so Chrome doesn't drop onend
+      speechSynthesis.speak(utterance);
+    });
+  }
 
-            if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.textContent.trim();
-                if (text.length > 0) output += text + " ";
-            }
+  async function startReading(checkbox) {
+    const root = document.querySelector('[data-tts-root]');
 
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const tag = node.tagName;
-                if (TAG_MAP[tag]) output += TAG_MAP[tag];
-            }
-        }
-
-        return output.trim();
+    if (!root) {
+      checkbox.checked = false;
+      return;
     }
 
-    function speak(text, lang = "lv") {
-        stop();
+    stopRequested = false;
+    reading = true;
+    paused = false;
 
-        utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang;
-        utterance.rate = 1;
-        utterance.pitch = 1;
+    const lang = root.getAttribute('lang') || 'lv';
+    const blocks = getBlocks(root);
 
-        utterance.onend = () => { isSpeaking = false; };
-        utterance.onerror = () => { isSpeaking = false; };
+    for (const block of blocks) {
+      if (stopRequested) break;
 
-        isSpeaking = true;
-        speechSynthesis.speak(utterance);
+      clearHighlight();
+      block.classList.add('tts-active');
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      await speakBlock(block.textContent.trim(), lang);
     }
 
-    function stop() {
-        if (isSpeaking) {
-            speechSynthesis.cancel();
-            isSpeaking = false;
-        }
+    // finished (or cancelled): reset everything
+    speechSynthesis.cancel();
+    clearHighlight();
+    reading = false;
+    paused = false;
+
+    checkbox.checked = false; // CSS switches the icon back
+  }
+
+  function pauseReading() {
+    paused = true;
+    speechSynthesis.pause(); // keeps position and highlight
+  }
+
+  function resumeReading() {
+    paused = false;
+    speechSynthesis.resume();
+  }
+
+  function findTtsCheckbox() {
+    let checkbox = document.getElementById('ttsToggle');
+    if (checkbox) return checkbox;
+
+    for (const host of document.querySelectorAll('*')) {
+      if (!host.shadowRoot) continue;
+      checkbox = host.shadowRoot.querySelector('#ttsToggle');
+      if (checkbox) return checkbox;
+    }
+    return null;
+  }
+
+  function init(attempt = 0) {
+    const checkbox = findTtsCheckbox();
+
+    if (!checkbox) {
+      if (attempt < 20) setTimeout(() => init(attempt + 1), 100); // component may render late
+      else console.warn('ttsToggle not found');
+      return;
     }
 
-    function init() {
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        // checked = play: resume if paused, otherwise start from the beginning
+        paused ? resumeReading() : startReading(checkbox);
+      } else if (reading) {
+        // unchecked while reading = pause only
+        pauseReading();
+      }
+    });
 
-        // Klausāmies checkbox pārslēgšanos
-        document.addEventListener("change", (e) => {
-            if (e.target.id === "ttsToggle") {
+    // don't leave a paused/ongoing utterance behind when leaving the page
+    window.addEventListener('beforeunload', () => speechSynthesis.cancel());
+  }
 
-                const root = document.querySelector('[data-tts-root][id="main"]');
-                if (!root) return;
-
-                const lang = root.getAttribute("lang") || "lv";
-                const text = extractSemanticText(root);
-
-                if (e.target.checked) {
-                    speak(text, lang);
-                } else {
-                    stop();
-                }
-            }
-        });
-    }
-
-    return { init, speak, stop };
+  if (document.readyState === 'complete') {
+    init();
+  } else {
+    window.addEventListener('DOMContentLoaded', () => init());
+  }
 
 })();
-
-KineportSemanticTTS.init();
-
-

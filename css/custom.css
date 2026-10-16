@@ -6,54 +6,54 @@ E-mail: loom.framework@gmail.com
 Created: 2008
 */
 
-/* API Dashboard Container */
-#api-result {
-    width: 100%;
-    max-width: 420px;
-    min-height: 180px;
-    /*max-height: 180px;*/
-
-    padding: 12px 14px;
-
-    font-size: 8px;
-    line-height: 0.7;
-    box-sizing: border-box;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
+.tts-toggle input {            /* hidden but still keyboard-focusable */
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Section header */
-#api-result .section-title {
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-
-/* Compact list */
-#api-result ul {
-    margin: 0;
-    padding-left: 14px;
-    padding-top: 0px;
-}
-
-#api-result li {
-    margin: 2px 0;
-    display: flex;
+.tts-btn {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: .75rem;
+    padding: 0px 21px;
+    border: 1px solid #d9d9d9;
+    border-radius: 999px;
+    background: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: .2s ease;
+    width: 170px;
+}
+.tts-btn:hover { background: #f8f8f8; }
+.tts-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* default = play state */
+.icon-stop, .label-stop { display: none; }
+
+/* checked = reading state */
+.tts-toggle input:checked + .tts-btn {
+  color: #2563eb;
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, .08);
+}
+.tts-toggle input:checked + .tts-btn .icon-play,
+.tts-toggle input:checked + .tts-btn .label-play { display: none; }
+.tts-toggle input:checked + .tts-btn .icon-stop  { display: inline; }
+.tts-toggle input:checked + .tts-btn .label-stop { display: inline; }
+
+.tts-toggle input:focus-visible + .tts-btn { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+/* highlighted block while reading */
+.tts-active {
+  border-left: 4px solid #2563eb;
+  padding-left: 1rem;
+  background: rgba(37, 99, 235, .08);
+  border-radius: .25rem;
+  transition: .25s ease;
 }
 
-/* Status icon */
-#api-result li .status-icon {
-    width: 16px;
-    text-align: center;
-    font-size: 12px;
+.tts-toggle {
+    padding-left: 24px;
 }
 
-/* Path aligned right */
-#api-result code {
-    margin-left: auto;
-    opacity: 0.6;
-    font-size: 11px;
-}
