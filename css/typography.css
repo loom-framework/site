@@ -45,6 +45,7 @@ Created: 2008
 
 /* HEADINGS: Tighter for impact and space-saving */
 h1 {
+    font-family: var(--font-heading);
     font-size: 2rem;
     margin-bottom: 0.5rem;
     /* 85% is a "Semi-Condensed" sweet spot for main titles */
@@ -53,6 +54,7 @@ h1 {
 }
 
 h2 {
+    font-family: var(--font-heading);
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
     /* 90% is slightly tighter than normal, good for sub-headers */
@@ -61,6 +63,7 @@ h2 {
 }
 
 h3 {
+    font-family: var(--font-heading);
     font-size: 1.2rem;
     /* 100% (Normal) is usually best for h3 as they are smaller */
     font-stretch: 100%; 
