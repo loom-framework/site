@@ -7,241 +7,71 @@
 // -----------------------------------------------------------------------------
 
 (() => {
+  if (!("speechSynthesis" in window)) return;
 
-    if (
-        !('speechSynthesis' in window) ||
-        !('SpeechSynthesisUtterance' in window)
-    ) {
-        console.warn('TTS not supported');
-        return;
+  const BLOCKS = "h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption";
+  let runId = 0; // lets stop/restart cancel an old loop
+
+  const clearHighlight = () =>
+    document.querySelectorAll(".tts-active")
+      .forEach(el => el.classList.remove("tts-active"));
+
+  const speak = (text, lang) =>
+    new Promise(resolve => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang;
+      u.onend = u.onerror = resolve;
+      speechSynthesis.speak(u);
+    });
+
+  async function start(toggle) {
+    const root = document.querySelector("[data-tts-root]");
+    if (!root) { toggle.checked = false; return; }
+
+    const myRun = ++runId;
+    const lang = root.getAttribute("lang") || "lv";
+    const blocks = [...root.querySelectorAll(BLOCKS)]
+      .filter(el => el.textContent.trim() && !el.closest("[data-tts-ignore]"));
+
+    for (const block of blocks) {
+      if (myRun !== runId) return;               // stopped or restarted
+      clearHighlight();
+      block.classList.add("tts-active");
+      block.scrollIntoView({ behavior: "smooth", block: "center" });
+      await speak(block.textContent.trim(), lang);
     }
 
-    let stopRequested = false;
-
-    const BLOCK_SELECTOR =
-        'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption';
-
-    function getButton() {
-        return document.querySelector('.tts-btn');
+    if (myRun === runId) {                       // finished naturally
+      clearHighlight();
+      toggle.checked = false;                    // CSS switches the icon back
     }
+  }
 
-    function getLabel() {
-        return document.getElementById('ttsLabel');
+  function stop() {
+    runId++;
+    speechSynthesis.cancel();
+    clearHighlight();
+  }
+
+  function findToggle() {
+    const el = document.getElementById("ttsToggle");
+    if (el) return el;
+    for (const host of document.querySelectorAll("*")) {
+      const found = host.shadowRoot?.getElementById("ttsToggle");
+      if (found) return found;
     }
-
-    function getIcon() {
-        return document.getElementById('ttsIconPath');
-    }
-
-    function setPlayMode() {
-
-        const btn = getButton();
-        const label = getLabel();
-        const icon = getIcon();
-
-        btn?.classList.remove('active');
-
-        if (label) {
-            label.textContent = 'Read Aloud';
-        }
-
-        if (icon) {
-            icon.setAttribute(
-                'd',
-                'M8 5v14l11-7z'
-            );
-        }
-    }
-
-    function setPauseMode() {
-
-        const btn = getButton();
-        const label = getLabel();
-        const icon = getIcon();
-
-        btn?.classList.add('active');
-
-        if (label) {
-            label.textContent = 'Stop Reading';
-        }
-
-        if (icon) {
-            icon.setAttribute(
-                'd',
-                'M6 5h4v14H6zm8 0h4v14h-4z'
-            );
-        }
-    }
-
-    function clearHighlight() {
-
-        document
-            .querySelectorAll('.tts-active')
-            .forEach(el =>
-                el.classList.remove('tts-active')
-            );
-
-    }
-
-    function getBlocks(root) {
-
-        return [
-            ...root.querySelectorAll(
-                BLOCK_SELECTOR
-            )
-        ]
-        .filter(el =>
-            el.textContent.trim() &&
-            !el.closest('[data-tts-ignore]')
-        );
-
-    }
-
-    function speakBlock(text, lang) {
-
-        return new Promise(resolve => {
-
-            const utterance =
-                new SpeechSynthesisUtterance(text);
-
-            utterance.lang = lang;
-
-            utterance.rate = 1;
-            utterance.pitch = 1;
-
-            utterance.onend = resolve;
-            utterance.onerror = resolve;
-
-            speechSynthesis.speak(
-                utterance
-            );
-
-        });
-
-    }
-
-    async function startReading(checkbox) {
-
-        const root =
-            document.querySelector('[data-tts-root]');
-
-        if (!root) return;
-
-        stopRequested = false;
-
-        setPauseMode();
-
-        const lang =
-            root.getAttribute('lang') || 'lv';
-
-        const blocks =
-            getBlocks(root);
-
-        for (const block of blocks) {
-
-            if (stopRequested)
-                break;
-
-            clearHighlight();
-
-            block.classList.add('tts-active');
-
-            block.scrollIntoView({
-                behavior:'smooth',
-                block:'center'
-            });
-
-            await speakBlock(
-                block.textContent.trim(),
-                lang
-            );
-        }
-
-        speechSynthesis.cancel();
-
-        clearHighlight();
-
-        setPlayMode();
-
-        if (checkbox) {
-            checkbox.checked = false;
-        }
-    }
-
-    function stopReading() {
-
-        stopRequested = true;
-
-        speechSynthesis.cancel();
-
-        clearHighlight();
-
-        setPlayMode();
-    }
-
-    function findTtsCheckbox() {
-
-        let checkbox =
-            document.getElementById('ttsToggle');
-
-        if (checkbox)
-            return checkbox;
-
-        const hosts =
-            document.querySelectorAll('*');
-
-        for (const host of hosts) {
-
-            if (!host.shadowRoot)
-                continue;
-
-            checkbox =
-                host.shadowRoot.querySelector(
-                    '#ttsToggle'
-                );
-
-            if (checkbox)
-                return checkbox;
-        }
-
-        return null;
-    }
-
-    function init() {
-
-        const checkbox =
-            findTtsCheckbox();
-
-        if (!checkbox) {
-            console.warn(
-                'ttsToggle not found'
-            );
-            return;
-        }
-
-        checkbox.addEventListener(
-            'change',
-            () => {
-
-                if (
-                    checkbox.checked
-                ) {
-
-                    startReading(
-                        checkbox
-                    );
-
-                } else {
-
-                    stopReading();
-                }
-            }
-        );
-    }
-
-    window.addEventListener(
-        'DOMContentLoaded',
-        init
+    return null;
+  }
+
+  function init() {
+    const toggle = findToggle();
+    if (!toggle) return;
+    toggle.addEventListener("change", () =>
+      toggle.checked ? start(toggle) : stop()
     );
+  }
 
+  document.readyState === "loading"
+    ? document.addEventListener("DOMContentLoaded", init)
+    : init();
 })();
