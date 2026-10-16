@@ -6,72 +6,49 @@ E-mail: loom.framework@gmail.com
 Created: 2008
 */
 
-/* ==========================
-   TTS BUTTON
-   ========================== */
-
-.tts-toggle{
-    display:inline-block;
+.tts-toggle input {            /* hidden but still keyboard-focusable */
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.tts-toggle input{
-    display:none;
+.tts-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem 1rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: .2s ease;
 }
+.tts-btn:hover { background: #f8f8f8; }
+.tts-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-.tts-btn{
+/* default = play state */
+.icon-stop, .label-stop { display: none; }
 
-    display:inline-flex;
-    align-items:center;
-    gap:.75rem;
-
-    padding:.65rem 1rem;
-
-    border:1px solid #d9d9d9;
-    border-radius:999px;
-
-    background:#fff;
-
-    cursor:pointer;
-
-    user-select:none;
-
-    transition:.2s ease;
+/* checked = reading state */
+.tts-toggle input:checked + .tts-btn {
+  color: #2563eb;
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, .08);
 }
+.tts-toggle input:checked + .tts-btn .icon-play,
+.tts-toggle input:checked + .tts-btn .label-play { display: none; }
+.tts-toggle input:checked + .tts-btn .icon-stop  { display: inline; }
+.tts-toggle input:checked + .tts-btn .label-stop { display: inline; }
 
-.tts-btn:hover{
-    background:#f8f8f8;
-}
+.tts-toggle input:focus-visible + .tts-btn { outline: 2px solid #2563eb; outline-offset: 2px; }
 
-.tts-btn svg{
-    width:18px;
-    height:18px;
-    fill:currentColor;
-}
-
-.tts-btn.active{
-
-    color:#2563eb;
-
-    border-color:#2563eb;
-
-    background:rgba(37,99,235,.08);
-}
-
-
-/* ==========================
-   ACTIVE READING
-   ========================== */
-
-.tts-active{
-
-    border-left:4px solid #2563eb;
-
-    padding-left:1rem;
-
-    background:rgba(37,99,235,.08);
-
-    border-radius:.25rem;
-
-    transition:.25s ease;
+/* highlighted block while reading */
+.tts-active {
+  border-left: 4px solid #2563eb;
+  padding-left: 1rem;
+  background: rgba(37, 99, 235, .08);
+  border-radius: .25rem;
+  transition: .25s ease;
 }
 
