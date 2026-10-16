@@ -15,7 +15,7 @@
 
   let stopRequested = false;
 
-  const BLOCK_SELECTOR = 'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption';
+  const BLOCK_SELECTOR = 'h1,h2,h3,h4,h5,h6,p,li,blockquote,figcaption,section,article,nav,aside';
 
   function clearHighlight() {
     document.querySelectorAll('.tts-active')
