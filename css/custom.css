@@ -17,7 +17,7 @@ Created: 2008
     align-items: center;
     gap: .75rem;
     padding: 0px 21px;
-    border: 1px solid #d9d9d9;
+    border: none;
     border-radius: 999px;
     background: #4ade80;
     cursor: pointer;
